@@ -1,9 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 import { Btn, Card, Chips, Field, Row, Screen, Select, T, num, str } from '../../components/ui';
 import { BRANDS, FORKS, SHOCKS, findModel, genFor, modelsFor, yearsFor, type ForkId, type ShockId } from '../../data/bikes';
-import { DEFAULT_SERVICES, uid, useStore, type Bike } from '../../store';
+import { servicesFor, uid, useStore, type Bike } from '../../store';
 
 export default function EditBike() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -49,9 +49,9 @@ export default function EditBike() {
     };
     update((s) => {
       const bikes = existing ? s.bikes.map((b) => (b.id === full.id ? full : b)) : [...s.bikes, full];
-      const services = existing
-        ? s.services
-        : [...s.services, ...DEFAULT_SERVICES.map((d) => ({ id: uid(), bikeId: full.id, name: d.name, intervalH: d.intervalH, lastH: full.hours }))];
+      // Ny cykel, eller bytt modell/år → hämta tillverkarens serviceschema.
+      const changed = !existing || existing.modelId !== full.modelId || existing.year !== full.year;
+      const services = changed ? [...s.services.filter((x) => x.bikeId !== full.id), ...servicesFor(full)] : s.services;
       return { ...s, bikes, services, activeBikeId: full.id };
     });
     router.back();
@@ -59,7 +59,7 @@ export default function EditBike() {
 
   const remove = () => {
     const doIt = () => {
-      update((s) => ({ ...s, bikes: s.bikes.filter((b) => b.id !== id), services: s.services.filter((x) => x.bikeId !== id) }));
+      update((s) => ({ ...s, bikes: s.bikes.filter((b) => b.id !== id), services: s.services.filter((x) => x.bikeId !== id), serviceLog: s.serviceLog.filter((x) => x.bikeId !== id) }));
       router.back();
     };
     if (Platform.OS === 'web') { if (window.confirm('Ta bort cykeln?')) doIt(); }
@@ -95,7 +95,12 @@ export default function EditBike() {
             placeholder={brand ? 'Välj modell' : '—'}
           />
         </Row>
-        <Field label="Smeknamn (valfritt)" value={bike.nickname ?? ''} onChange={(v) => set({ nickname: v || undefined })} />
+        <Row>
+          <Field label="Smeknamn (valfritt)" value={bike.nickname ?? ''} onChange={(v) => set({ nickname: v || undefined })} />
+          <View style={{ width: 130 }}>
+            <Field label="Motortimmar nu" numeric value={str(bike.hours)} onChange={(v) => set({ hours: num(v) ?? 0 })} />
+          </View>
+        </Row>
       </Card>
 
       {model && gen ? (
@@ -129,7 +134,6 @@ export default function EditBike() {
             <Field label="Stöt HS-komp. (varv)" numeric value={str(stock.shockHsc)} onChange={(v) => setStock('shockHsc', v)} />
             <Field label="Stöt retur" numeric value={str(stock.shockReb)} onChange={(v) => setStock('shockReb', v)} />
           </Row>
-          <Field label="Motortimmar nu" numeric value={str(bike.hours)} onChange={(v) => set({ hours: num(v) ?? 0 })} />
         </Card>
       ) : null}
 

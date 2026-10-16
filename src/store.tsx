@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { ForkId, ShockId } from './data/bikes';
+import { findModel, type ForkId, type ShockId } from './data/bikes';
+import { serviceTemplate, type Src } from './data/service';
 import type { Rider, Terrain } from './logic/suspension';
 
 export type Clickers = {
@@ -26,6 +27,8 @@ export type Bike = {
   /** Fabrikens standardklick (klick ut från helt stängd) från instruktionsboken. */
   stock: Clickers;
   hours: number;
+  /** Starttid (ms) för pågående körning – timmarna läggs till när den stoppas. */
+  rideStart?: number;
 };
 
 export type EngineMap = {
@@ -53,7 +56,22 @@ export type SessionLog = {
   notes: string;
 };
 
-export type Service = { id: string; bikeId: string; name: string; intervalH: number; lastH: number };
+export type Service = {
+  id: string;
+  bikeId: string;
+  key?: string;
+  name: string;
+  what?: string;
+  intervalH?: number;
+  months?: number;
+  once?: boolean;
+  done?: boolean;
+  src?: Src;
+  lastH: number;
+  lastDate?: number;
+};
+
+export type ServiceLog = { id: string; bikeId: string; name: string; date: number; hours: number; note?: string };
 
 export type State = {
   rider: Rider & { name: string };
@@ -62,6 +80,7 @@ export type State = {
   maps: EngineMap[];
   logs: SessionLog[];
   services: Service[];
+  serviceLog: ServiceLog[];
 };
 
 const KEY = 'mxex:v1';
@@ -72,6 +91,7 @@ const initial: State = {
   maps: [],
   logs: [],
   services: [],
+  serviceLog: [],
 };
 
 type Ctx = {
@@ -124,13 +144,33 @@ export function useActiveBike(): Bike | undefined {
 
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-/** Standardintervall i timmar – kan ändras per cykel. */
-export const DEFAULT_SERVICES: { name: string; intervalH: number }[] = [
-  { name: 'Motorolja + filter', intervalH: 10 },
-  { name: 'Luftfilter (tvätt)', intervalH: 2 },
-  { name: 'Gaffelolja / service', intervalH: 30 },
-  { name: 'Stötdämparservice', intervalH: 30 },
-  { name: 'Kolv (4-takt 450)', intervalH: 50 },
-  { name: 'Ventiljustering, kontroll', intervalH: 15 },
-  { name: 'Kedja & drev, kontroll', intervalH: 5 },
-];
+/** Serviceposter från tillverkarens schema för en cykel. */
+export function servicesFor(bike: Pick<Bike, 'id' | 'modelId' | 'year' | 'hours'>): Service[] {
+  const m = findModel(bike.modelId);
+  if (!m) return [];
+  return serviceTemplate(m, bike.year).items.filter((it) => !(it.once && bike.hours >= (it.intervalH ?? 0))).map((it) => ({
+    id: uid(),
+    bikeId: bike.id,
+    key: it.key,
+    name: it.name,
+    what: it.what,
+    intervalH: it.intervalH,
+    months: it.months,
+    once: it.once,
+    src: it.src,
+    lastH: bike.hours,
+    lastDate: Date.now(),
+  }));
+}
+
+export type Due = { left?: number; daysLeft?: number; level: 'over' | 'soon' | 'ok' | 'done' };
+
+/** Hur nära en servicepost är (timmar och/eller månader – det som kommer först). */
+export function dueOf(x: Service, hours: number, now = Date.now()): Due {
+  if (x.once && x.done) return { level: 'done' };
+  const left = x.intervalH != null ? (x.once ? x.intervalH - hours : x.intervalH - (hours - x.lastH)) : undefined;
+  const daysLeft = x.months != null ? Math.round(((x.lastDate ?? now) + x.months * 30.44 * 864e5 - now) / 864e5) : undefined;
+  const over = (left != null && left <= 0) || (daysLeft != null && daysLeft <= 0);
+  const soon = (left != null && x.intervalH != null && left <= Math.max(1, x.intervalH * 0.2)) || (daysLeft != null && daysLeft <= 30);
+  return { left, daysLeft, level: over ? 'over' : soon ? 'soon' : 'ok' };
+}

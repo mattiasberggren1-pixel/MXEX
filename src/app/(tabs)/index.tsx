@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { FORKS, findModel } from '../../data/bikes';
 import { Btn, C, Card, Chips, Field, Row, Screen, T, num, str } from '../../components/ui';
 import { DISCIPLINES, SKILLS } from '../../logic/suspension';
-import { useActiveBike, useStore } from '../../store';
+import { dueOf, useActiveBike, useStore } from '../../store';
 
 export default function Garage() {
   const { state, update } = useStore();
@@ -42,6 +42,9 @@ export default function Garage() {
                   <T dim size={13}>{FORKS[b.fork].name} · {b.hours} h</T>
                 </View>
                 {on ? <T color={C.accent} bold>Aktiv</T> : null}
+              </Row>
+              <Row>
+                <ServiceBtn bikeId={b.id} hours={b.hours} />
                 <Btn small kind="ghost" title="Ändra" onPress={() => router.push(`/bike/${b.id}`)} />
               </Row>
             </Pressable>
@@ -53,5 +56,19 @@ export default function Garage() {
         <T dim size={14}>1. Fyll i vikt och nivå. 2. Lägg till cykeln. 3. Fliken Fjädring ger fjädrar, sag och klick för dagens underlag. 4. Fliken Motor visar vad din cykel kan mappas med och låter dig spara och dela mappar via QR-kod eller länk.</T>
       </Card>
     </Screen>
+  );
+}
+
+function ServiceBtn({ bikeId, hours }: { bikeId: string; hours: number }) {
+  const { state } = useStore();
+  const due = state.services.filter((x) => x.bikeId === bikeId).map((x) => dueOf(x, hours).level);
+  const over = due.filter((l) => l === 'over').length;
+  const soon = due.filter((l) => l === 'soon').length;
+  const badge = over ? `${over} att göra` : soon ? `${soon} snart` : null;
+  return (
+    <Pressable onPress={() => router.push(`/service/${bikeId}`)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: over ? C.bad : C.line, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 }}>
+      <T bold>🔧 Service</T>
+      {badge ? <View style={{ backgroundColor: over ? C.bad : C.warn, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}><T bold size={12} color="#000">{badge}</T></View> : <T dim size={13}>allt ok</T>}
+    </Pressable>
   );
 }

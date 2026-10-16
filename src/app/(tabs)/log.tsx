@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Btn, C, Card, Chips, Field, Row, Screen, Stat, T, num, str } from '../../components/ui';
+import { Btn, C, Card, Chips, Field, Row, Screen, Stat, T } from '../../components/ui';
 import { findModel } from '../../data/bikes';
 import { TERRAINS } from '../../logic/suspension';
 import { uid, useActiveBike, useStore, type SessionLog } from '../../store';
 
-const TABS = ['Pass', 'Service', 'Varvtid'] as const;
+const TABS = ['Pass', 'Varvtid'] as const;
 
 export default function Log() {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Pass');
   return (
     <Screen>
       <Chips options={TABS} value={tab} onChange={setTab} />
-      {tab === 'Pass' ? <Sessions /> : tab === 'Service' ? <Service /> : <LapTimer />}
+      {tab === 'Pass' ? <Sessions /> : <LapTimer />}
     </Screen>
   );
 }
@@ -54,52 +54,6 @@ function Sessions() {
           </Pressable>
         );
       })}
-    </>
-  );
-}
-
-function Service() {
-  const { state, update } = useStore();
-  const bike = useActiveBike();
-  const [newName, setNewName] = useState('');
-  const [newInt, setNewInt] = useState('');
-  if (!bike) return <T dim>Lägg till en cykel i Garaget först.</T>;
-  const items = state.services.filter((x) => x.bikeId === bike.id);
-  const setHours = (h: number) => update((s) => ({ ...s, bikes: s.bikes.map((b) => (b.id === bike.id ? { ...b, hours: Math.round(h * 10) / 10 } : b)) }));
-  return (
-    <>
-      <Card title="Motortimmar">
-        <Row>
-          <Field label="Timmar" numeric value={str(bike.hours)} onChange={(v) => setHours(num(v) ?? 0)} />
-          <Btn title="+0,5 h" kind="ghost" onPress={() => setHours(bike.hours + 0.5)} />
-          <Btn title="+1 h" onPress={() => setHours(bike.hours + 1)} />
-        </Row>
-      </Card>
-      {items.map((x) => {
-        const left = x.intervalH - (bike.hours - x.lastH);
-        const color = left <= 0 ? C.bad : left <= x.intervalH * 0.2 ? C.warn : C.good;
-        return (
-          <Card key={x.id} title={x.name} right={<T bold color={color}>{left <= 0 ? `${str(Math.round(-left * 10) / 10)} h över` : `${str(Math.round(left * 10) / 10)} h kvar`}</T>}>
-            <T dim size={13}>Var {x.intervalH}:e timme · senast vid {str(x.lastH)} h</T>
-            <Row>
-              <Btn small title="Gjort nu" onPress={() => update((s) => ({ ...s, services: s.services.map((y) => (y.id === x.id ? { ...y, lastH: bike.hours } : y)) }))} />
-              <Btn small kind="danger" title="Ta bort" onPress={() => update((s) => ({ ...s, services: s.services.filter((y) => y.id !== x.id) }))} />
-            </Row>
-          </Card>
-        );
-      })}
-      <Card title="Ny påminnelse">
-        <Row>
-          <Field label="Vad" value={newName} onChange={setNewName} placeholder="t.ex. Bromsvätska" />
-          <View style={{ width: 100 }}><Field label="Var X:e h" numeric value={newInt} onChange={setNewInt} /></View>
-        </Row>
-        <Btn small title="Lägg till" onPress={() => {
-          const n = num(newInt);
-          if (!newName || !n) return;
-          update((s) => ({ ...s, services: [...s.services, { id: uid(), bikeId: bike.id, name: newName, intervalH: n, lastH: bike.hours }] }));
-          setNewName(''); setNewInt('');
-        }} />
-      </Card>
     </>
   );
 }
