@@ -90,7 +90,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     AsyncStorage.getItem(KEY)
       .then((raw) => {
-        if (raw) setState({ ...initial, ...JSON.parse(raw) });
+        if (raw) {
+          const saved = JSON.parse(raw);
+          // Nivån "van" heter numera "avancerad".
+          if (saved.rider?.skill === 'van') saved.rider.skill = 'avancerad';
+          setState({ ...initial, ...saved });
+        }
       })
       .finally(() => {
         loaded.current = true;

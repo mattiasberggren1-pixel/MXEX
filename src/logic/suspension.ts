@@ -1,10 +1,10 @@
 import { FORKS, type BikeClass, type ForkId, type Model } from '../data/bikes';
 
-export type Skill = 'nybörjare' | 'motionär' | 'van' | 'elit';
+export type Skill = 'nybörjare' | 'motionär' | 'avancerad' | 'elit';
 export type Discipline = 'motocross' | 'enduro' | 'supercross';
 export type Terrain = 'blandat' | 'sand' | 'hårt' | 'lera' | 'sten-rötter' | 'stora-hopp';
 
-export const SKILLS: Skill[] = ['nybörjare', 'motionär', 'van', 'elit'];
+export const SKILLS: Skill[] = ['nybörjare', 'motionär', 'avancerad', 'elit'];
 export const DISCIPLINES: Discipline[] = ['motocross', 'enduro', 'supercross'];
 export const TERRAINS: { id: Terrain; label: string }[] = [
   { id: 'blandat', label: 'Blandat / normal bana' },
@@ -33,7 +33,7 @@ const CLASS_BASE: Record<BikeClass, { ref: number; fork: number; shock: number }
 // Hur mycket fjäderhårdheten ska ändras per kg från referensvikten (andel/kg).
 const SLOPE = 0.0045;
 
-const SKILL_FACTOR: Record<Skill, number> = { nybörjare: -0.03, motionär: 0, van: 0.025, elit: 0.05 };
+const SKILL_FACTOR: Record<Skill, number> = { nybörjare: -0.03, motionär: 0, avancerad: 0.025, elit: 0.05 };
 const DISC_FACTOR: Record<Discipline, { fork: number; shock: number }> = {
   motocross: { fork: 0, shock: 0 },
   enduro: { fork: -0.05, shock: -0.03 },
@@ -184,7 +184,7 @@ const T: Record<Terrain, Omit<ClickerRec, 'notes' | 'tyres'> & { tyres: [number,
 export function clickerRec(rider: Rider, terrain: Terrain, spring: SpringRec, stockSprings: boolean): ClickerRec {
   const t = T[terrain];
   const r: ClickerRec = { ...t, notes: [t.note] };
-  const sk = { nybörjare: -2, motionär: -1, van: 0, elit: 2 }[rider.skill];
+  const sk = { nybörjare: -2, motionär: -1, avancerad: 0, elit: 2 }[rider.skill];
   r.forkComp += sk;
   r.shockLsc += sk;
   r.forkReb += Math.sign(sk);
