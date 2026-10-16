@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Btn, C, Card, Chips, Field, Row, Screen, Stat, T, num, str } from '../../components/ui';
+import { Btn, C, Card, Chips, cap, Field, Row, Screen, Stat, T, num, str } from '../../components/ui';
 import { FORKS, findModel, genFor } from '../../data/bikes';
 import {
   TERRAINS, absClicks, analyzeSag, clickText, clickerRec, kg, rebText, sagTarget, springRec, type Terrain,
@@ -64,7 +64,7 @@ export default function Suspension() {
 
   return (
     <Screen>
-      <T dim size={13}>{model.brand} {model.name} {bike.year} · {FORKS[bike.fork].name} · {rider.weightKg} kg, {rider.skill}, {rider.discipline}</T>
+      <T dim size={13}>{model.brand} {model.name} {bike.year} · {FORKS[bike.fork].name} · {rider.weightKg} kg · {cap(rider.skill)} · {cap(rider.discipline)}</T>
 
       <Card title="Fjädrar för din vikt">
         <Row wrap>

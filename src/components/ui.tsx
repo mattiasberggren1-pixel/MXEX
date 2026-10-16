@@ -77,6 +77,8 @@ export function Field({ label, value, onChange, placeholder, numeric, multiline 
   );
 }
 
+export const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
 /** Tolkar tal med komma eller punkt. */
 export const num = (v: string): number | undefined => {
   const n = parseFloat(v.replace(',', '.'));
@@ -93,7 +95,7 @@ export function Chips<T extends string>({ options, value, onChange, labels }: {
         const on = o === value;
         return (
           <Pressable key={o} onPress={() => onChange(o)} style={[s.chip, on && { backgroundColor: C.accent, borderColor: C.accent }]}>
-            <Text style={{ color: on ? '#000' : C.text, fontWeight: on ? '700' : '400' }}>{labels?.[o] ?? o}</Text>
+            <Text style={{ color: on ? '#000' : C.text, fontWeight: on ? '700' : '400' }}>{labels?.[o] ?? cap(o)}</Text>
           </Pressable>
         );
       })}
