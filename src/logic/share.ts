@@ -1,8 +1,8 @@
 import type { EngineMap } from '../store';
 
 // Delningsformat: en länk som också ryms i en QR-kod.
-//   dialedmx://map?d=<urlkodad kompakt JSON>
-// Samma JSON (med v:1) används i .dialedmx-filer.
+//   mxex://map?d=<urlkodad kompakt JSON>
+// Samma JSON (med v:1) används i .mxex-filer.
 
 type Packed = {
   v: 1;
@@ -22,7 +22,7 @@ export function pack(map: EngineMap): string {
 }
 
 export function toLink(map: EngineMap) {
-  return `dialedmx://map?d=${encodeURIComponent(pack(map))}`;
+  return `mxex://map?d=${encodeURIComponent(pack(map))}`;
 }
 
 /** Tar emot länk, QR-innehåll eller ren JSON. Returnerar null om det inte går att läsa. */

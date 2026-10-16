@@ -58,7 +58,7 @@ export default function MapEditor() {
 
   const shareLink = async () => {
     const m = save();
-    await Share.share({ message: `DialedMX-mapp "${m.name}" (${m.model ?? ''}). Öppna i DialedMX → Motor → Importera:\n${toLink(m)}` });
+    await Share.share({ message: `MXEX-mapp "${m.name}" (${m.model ?? ''}). Öppna i MXEX → Motor → Importera:\n${toLink(m)}` });
   };
 
   const shareFile = async () => {
@@ -67,11 +67,11 @@ export default function MapEditor() {
       const blob = new Blob([pack(m)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `${m.name.replace(/[^\wåäöÅÄÖ-]+/g, '_')}.dialedmx`;
+      a.download = `${m.name.replace(/[^\wåäöÅÄÖ-]+/g, '_')}.mxex`;
       a.click();
       return;
     }
-    const f = new File(Paths.cache, `${m.name.replace(/[^\w-]+/g, '_')}.dialedmx`);
+    const f = new File(Paths.cache, `${m.name.replace(/[^\w-]+/g, '_')}.mxex`);
     await f.write(pack(m));
     await Sharing.shareAsync(f.uri, { mimeType: 'application/json', dialogTitle: 'Dela mapp' });
   };
@@ -138,7 +138,7 @@ export default function MapEditor() {
           </Row>
           {grid.rows === 4 ? (
             <>
-              <T dim size={13}>Utgångspunkter (DialedMX egna förslag, inte tillverkarens):</T>
+              <T dim size={13}>Utgångspunkter (MXEX egna förslag, inte tillverkarens):</T>
               <Row wrap>
                 {PRESETS.map((p) => <Btn key={p.name} small kind="ghost" title={p.name} onPress={() => set({ fuel: p.fuel.map((x) => [...x]), ign: p.ign.map((x) => [...x]), notes: map.notes || p.note })} />)}
               </Row>
@@ -164,7 +164,7 @@ export default function MapEditor() {
         {showShare ? (
           <View style={{ alignItems: 'center', padding: 12, backgroundColor: '#fff', borderRadius: 12 }}>
             <QRCode value={toLink(map)} size={240} ecl="L" />
-            <Text style={{ marginTop: 8, color: '#000' }}>Skanna i DialedMX → Motor → Importera</Text>
+            <Text style={{ marginTop: 8, color: '#000' }}>Skanna i MXEX → Motor → Importera</Text>
           </View>
         ) : null}
       </Card>

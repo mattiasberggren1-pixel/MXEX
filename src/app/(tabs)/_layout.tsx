@@ -19,7 +19,7 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: C.card },
         headerTintColor: C.text,
       }}>
-      <Tabs.Screen name="index" options={{ title: 'Garage', headerTitle: 'DialedMX', tabBarIcon: icon('bicycle') }} />
+      <Tabs.Screen name="index" options={{ title: 'Garage', headerTitle: 'MXEX', tabBarIcon: icon('bicycle') }} />
       <Tabs.Screen name="suspension" options={{ title: 'Fjädring', tabBarIcon: icon('options') }} />
       <Tabs.Screen name="engine" options={{ title: 'Motor', tabBarIcon: icon('flash') }} />
       <Tabs.Screen name="log" options={{ title: 'Logg', tabBarIcon: icon('stopwatch') }} />

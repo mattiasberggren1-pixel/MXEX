@@ -2,7 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { ImportView } from '../../components/ImportView';
 import { Screen } from '../../components/ui';
 
-// Djuplänk: dialedmx://map?d=… öppnar appen här.
+// Djuplänk: mxex://map?d=… öppnar appen här.
 export default function MapLink() {
   const { d } = useLocalSearchParams<{ d?: string }>();
   return (

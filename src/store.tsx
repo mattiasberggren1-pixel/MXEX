@@ -64,7 +64,7 @@ export type State = {
   services: Service[];
 };
 
-const KEY = 'dialedmx:v1';
+const KEY = 'mxex:v1';
 
 const initial: State = {
   rider: { name: '', weightKg: 80, skill: 'motionär', discipline: 'motocross' },

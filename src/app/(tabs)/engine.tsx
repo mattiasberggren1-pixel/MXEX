@@ -53,7 +53,7 @@ export default function Engine() {
             <T dim size={14}>{t}</T>
           </View>
         ))}
-        <T dim size={12}>DialedMX kan inte skriva direkt till styrenheten – tillverkarnas protokoll och kartfiler är låsta/krypterade. Här skapar, sparar och delar du mappar, och för sedan över värdena i tillverkarens app (det tar under en minut).</T>
+        <T dim size={12}>MXEX kan inte skriva direkt till styrenheten – tillverkarnas protokoll och kartfiler är låsta/krypterade. Här skapar, sparar och delar du mappar, och för sedan över värdena i tillverkarens app (det tar under en minut).</T>
       </Card>
     </Screen>
   );

@@ -56,7 +56,7 @@ export function ImportView({ initial }: { initial?: string }) {
             />
           </View>
         ) : null}
-        <Field label="…eller klistra in länken du fått" multiline value={text} onChange={setText} placeholder="dialedmx://map?d=…" />
+        <Field label="…eller klistra in länken du fått" multiline value={text} onChange={setText} placeholder="mxex://map?d=…" />
       </Card>
       {text && !parsed ? <T color={C.bad}>Kunde inte läsa mappen – kontrollera att hela länken kom med.</T> : null}
       {parsed ? (

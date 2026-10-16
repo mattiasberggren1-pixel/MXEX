@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "DialedMX",
-    "slug": "dialedmx",
+    "name": "MXEX",
+    "slug": "mxex",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "se.dialedmx.app",
+      "bundleIdentifier": "se.mxex.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -21,13 +21,13 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "se.dialedmx.app"
+      "package": "se.mxex.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "output": "single",
       "bundler": "metro",
-      "name": "DialedMX",
+      "name": "MXEX",
       "themeColor": "#ff6a13"
     },
     "plugins": [
@@ -36,14 +36,14 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "DialedMX använder kameran för att skanna QR-koder med delade mappar.",
+          "cameraPermission": "MXEX använder kameran för att skanna QR-koder med delade mappar.",
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": true
         }
       ],
       "expo-font"
     ],
-    "scheme": "dialedmx",
+    "scheme": "mxex",
     "backgroundColor": "#0f1115"
   }
 }

@@ -1,4 +1,4 @@
-# DialedMX
+# MXEX
 
 Ställ in din crosscykel: fjädring efter din vikt och dagens underlag, mappning för ditt märke och delning av inställningar med kompisar.
 
@@ -14,7 +14,7 @@ Ställ in din crosscykel: fjädring efter din vikt och dagens underlag, mappning
 - **Motor / mappning**
   - Visar vad just din modell och årsmodell kan ställas in med. Exempel: Yamaha Power Tuner (Wi-Fi), Honda motorlägen + HSTC, Kawasaki-kontakter och Rideology, Suzuki S-HAC och MX-Tuner, KTM-koncernens mappknapp + TC + quickshifter + Connectivity Unit.
   - Karteditor för bränsle och tändning med samma rutnät som tillverkarens app (4×4 för Yamaha Wi-Fi, 3×3 för GYTR). Fält för TC, launch, snabbinställning 1–7 med mera.
-  - Delning via QR-kod, länk (`dialedmx://map?d=…`) eller `.dialedmx`-fil.
+  - Delning via QR-kod, länk (`mxex://map?d=…`) eller `.mxex`-fil.
 - **Logg**
   - Pass med bana, underlag, inställning och betyg.
   - Servicepåminnelser per motortimme.
@@ -31,7 +31,7 @@ All data sparas lokalt i telefonen. Det finns inget konto och ingen server.
 
 | Plattform | Så här |
 |---|---|
-| **Android** | Ladda ner `DialedMX.apk` under **Releases** → öppna filen → tillåt "installera okända appar". |
+| **Android** | Ladda ner `MXEX.apk` under **Releases** → öppna filen → tillåt "installera okända appar". |
 | **iPhone** | Öppna webbappen (GitHub Pages-länken) i Safari → Dela → *Lägg till på hemskärmen*. En riktig App Store/TestFlight-version kräver ett Apple Developer-konto (99 USD/år), se nedan. |
 
 ## Utveckla

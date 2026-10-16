@@ -28,13 +28,13 @@ jobs:
       - name: Bygg APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
-      - run: cp android/app/build/outputs/apk/release/app-release.apk DialedMX.apk
+      - run: cp android/app/build/outputs/apk/release/app-release.apk MXEX.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: DialedMX-apk
-          path: DialedMX.apk
+          name: MXEX-apk
+          path: MXEX.apk
       - name: Publicera release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: DialedMX.apk
+          files: MXEX.apk
