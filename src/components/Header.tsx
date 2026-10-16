@@ -4,20 +4,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText } from 'react-native-svg';
 import { C } from './ui';
 
-/** MXEX-logga: vit text, svart kontur, tunn vit linje utanför, lätt lutad åt höger. */
+/** MXEX-logga: vit text, svart kontur och tunn vit linje utanför. */
 export function Logo({ height = 44 }: { height?: number }) {
-  const w = height * 3.4;
+  const w = height * 3.3;
   const fs = height * 0.82;
   const common = {
-    x: height * 0.18,
+    x: w / 2,
+    textAnchor: 'middle' as const,
     y: height * 0.8,
     fontSize: fs,
     fontWeight: '900' as const,
-    fontStyle: 'italic' as const,
     fontFamily: 'Arial Black, Arial, Helvetica, sans-serif',
     letterSpacing: height * 0.07,
     strokeLinejoin: 'round' as const,
-    transform: `skewX(-12) translate(${height * 0.15} 0)`,
   };
   return (
     <Svg width={w} height={height}>
@@ -31,15 +30,14 @@ export function Logo({ height = 44 }: { height?: number }) {
 export function Header({ title, onBack }: { title?: string; onBack?: () => void }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ backgroundColor: '#000', paddingTop: insets.top + 6, paddingBottom: 8, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: C.line }}>
+    <View style={{ backgroundColor: '#000', paddingTop: insets.top + 6, paddingBottom: 6, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.line }}>
       {onBack ? (
-        <Pressable onPress={onBack} hitSlop={12} style={{ paddingRight: 4 }}>
-          <Ionicons name="chevron-back" size={26} color="#fff" />
+        <Pressable onPress={onBack} hitSlop={12} style={{ position: 'absolute', left: 10, top: insets.top + 16 }}>
+          <Ionicons name="chevron-back" size={28} color="#fff" />
         </Pressable>
       ) : null}
       <Logo />
-      <View style={{ flex: 1 }} />
-      {title ? <Text style={{ color: C.dim, fontSize: 16, fontWeight: '700' }}>{title}</Text> : null}
+      {title ? <Text style={{ color: C.dim, fontSize: 13, fontWeight: '700', marginTop: 2, letterSpacing: 1 }}>{title.toUpperCase()}</Text> : null}
     </View>
   );
 }
