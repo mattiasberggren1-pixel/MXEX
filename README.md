@@ -27,12 +27,14 @@ All data sparas lokalt i telefonen. Det finns inget konto och ingen server.
 - Appen skriver **inte** direkt till cykelns styrenhet. Tillverkarnas protokoll är slutna, och Yamahas kartfiler (`.yptsjsnz`) är krypterade. Du för därför över värdena för hand i tillverkarens app, vilket tar under en minut.
 - Fjäder- och klickråden är riktvärden. Stäm av med en fjädringsverkstad innan du köper fjädrar.
 
-## Installera
+## Använda
 
-| Plattform | Så här |
-|---|---|
-| **Android** | Ladda ner `MXEX.apk` under **Releases** → öppna filen → tillåt "installera okända appar". |
-| **iPhone** | Öppna webbappen (GitHub Pages-länken) i Safari → Dela → *Lägg till på hemskärmen*. En riktig App Store/TestFlight-version kräver ett Apple Developer-konto (99 USD/år), se nedan. |
+Öppna webbadressen (GitHub Pages) i mobilen. Installera den sedan som en app:
+
+- **iPhone (Safari):** Dela → *Lägg till på hemskärmen*.
+- **Android (Chrome):** meny ⋮ → *Installera app* eller *Lägg till på startskärmen*.
+
+Appen fungerar offline ute på banan efter första besöket.
 
 ## Utveckla
 
@@ -43,8 +45,8 @@ npx expo export -p web  # webbversion i dist/
 npm run typecheck
 ```
 
-## Bygga och publicera
+## Publicera
 
-- **Android-APK:** `git tag v1.0.0 && git push --tags`. GitHub Actions (`.github/workflows/android.yml`) bygger då APK:n och lägger den under Releases.
-- **Webbapp:** varje push till `main` publiceras på GitHub Pages (`web.yml`). Aktivera först Pages i repo-inställningarna med källan "GitHub Actions".
-- **iOS (TestFlight):** kräver ett Apple Developer-konto. Kör `npx eas-cli@latest build -p ios --profile production` och sedan `npx eas-cli@latest submit -p ios`. Bjud in testare via en publik TestFlight-länk.
+Varje push till `main` byggs och publiceras automatiskt på GitHub Pages via `.github/workflows/web.yml`. I repot: Settings → Pages → Source: **GitHub Actions**.
+
+Lokalt: `npm run build:web && npm run serve`.
