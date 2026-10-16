@@ -38,7 +38,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:web": "node scripts/build-web.mjs",
+    "serve": "node scripts/serve.mjs"
   },
   "private": true
 }

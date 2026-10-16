@@ -1,7 +1,9 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import type { EngineMap } from '../store';
 
 // Delningsformat: en länk som också ryms i en QR-kod.
-//   mxex://map?d=<urlkodad kompakt JSON>
+//   https://<webbadress>/map?d=<urlkodad kompakt JSON>  (mxex://map?d=… i native-appen)
 // Samma JSON (med v:1) används i .mxex-filer.
 
 type Packed = {
@@ -22,7 +24,9 @@ export function pack(map: EngineMap): string {
 }
 
 export function toLink(map: EngineMap) {
-  return `mxex://map?d=${encodeURIComponent(pack(map))}`;
+  // På webben blir länken klickbar och öppnar import-sidan direkt.
+  const base = Platform.OS === 'web' && typeof location !== 'undefined' ? `${location.origin}${Constants.expoConfig?.experiments?.baseUrl ?? ''}/map` : 'mxex://map';
+  return `${base}?d=${encodeURIComponent(pack(map))}`;
 }
 
 /** Tar emot länk, QR-innehåll eller ren JSON. Returnerar null om det inte går att läsa. */

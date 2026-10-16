@@ -58,7 +58,7 @@ export default function MapEditor() {
 
   const shareLink = async () => {
     const m = save();
-    await Share.share({ message: `MXEX-mapp "${m.name}" (${m.model ?? ''}). Öppna i MXEX → Motor → Importera:\n${toLink(m)}` });
+    await Share.share({ message: `MXEX-mapp "${m.name}" (${m.model ?? ''}). Öppna länken:\n${toLink(m)}` });
   };
 
   const shareFile = async () => {
