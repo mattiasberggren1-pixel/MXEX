@@ -130,11 +130,11 @@ export default function MapEditor() {
             ))}
           </View>
           <Row>
-            <Btn title="−1" kind="ghost" onPress={() => bump(-1)} />
+            <StepBtn label="−1" color={C.blue} onPress={() => bump(-1)} />
             <View style={{ flex: 1 }}>
               <T dim size={12} style={{ textAlign: 'center' }}>{grid.rowLabels[sel[0]]} · {grid.colLabels[sel[1]]}</T>
             </View>
-            <Btn title="+1" kind="ghost" onPress={() => bump(1)} />
+            <StepBtn label="+1" color={C.accent} onPress={() => bump(1)} />
           </Row>
           {grid.rows === 4 ? (
             <>
@@ -171,6 +171,19 @@ export default function MapEditor() {
 
       {existing ? <Btn kind="danger" title="Ta bort mapp" onPress={remove} /> : null}
     </Screen>
+  );
+}
+
+function StepBtn({ label, color, onPress }: { label: string; color: string; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: 84, height: 56, borderRadius: 12, backgroundColor: color, alignItems: 'center', justifyContent: 'center',
+        borderBottomWidth: pressed ? 1 : 4, borderBottomColor: 'rgba(0,0,0,0.45)', transform: [{ translateY: pressed ? 3 : 0 }],
+      })}>
+      <Text style={{ color: '#000', fontSize: 24, fontWeight: '900' }}>{label}</Text>
+    </Pressable>
   );
 }
 
