@@ -4,15 +4,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText } from 'react-native-svg';
 import { C } from './ui';
 
-/** MXEX-logga: vit text, svart kontur och tunn vit linje utanför, lätt lutad. */
+/** MXEX-logga: vit text, svart kontur och tunn vit linje utanför (rak – bara app-ikonen lutar). */
 export function Logo({ height = 44 }: { height?: number }) {
   const w = height * 3.3;
   const fs = height * 0.82;
   const common = {
     x: w / 2,
     textAnchor: 'middle' as const,
-    // Lätt lutning åt höger (halva den ursprungliga).
-    transform: `translate(${height * 0.17} 0) skewX(-12)`,
     y: height * 0.8,
     fontSize: fs,
     fontWeight: '900' as const,
