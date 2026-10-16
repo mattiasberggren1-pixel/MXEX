@@ -210,3 +210,33 @@ export function oilFor(model: Model): OilRec {
       return { what: 'Motorolja', grade: '10W-40/10W-50 (JASO MA2)', example: 'Se instruktionsboken' };
   }
 }
+
+// ---- Delar ----
+const PART_TERMS: Record<string, string> = {
+  air: 'luftfilter',
+  chain: 'kedjekit drev',
+  oil: 'oljefilter',
+  oilfilter: 'oljefilter',
+  gearoil: 'växellådsolja',
+  piston: 'kolv kolvsats',
+  valves: 'ventilshims',
+  linkage: 'länkagelager',
+  fork: 'gaffelolja',
+  shock: 'stötdämparolja',
+  steering: 'styrlager',
+  fuel: 'bränslefilter',
+  fluids: 'bromsvätska kylarvätska',
+  reeds: 'membranblad',
+};
+
+/** Söklänk till delar på 24MX för en servicepost (Google-sökning begränsad till 24mx.se). */
+export function partsLink(key: string | undefined, model: Model, year: number): string | null {
+  const term = key?.startsWith('ktm-') ? 'servicekit' : key ? PART_TERMS[key] : undefined;
+  if (!term) return null;
+  const q = `site:24mx.se ${term} ${model.brand} ${model.name.split(' / ')[0]} ${year}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+}
+
+/** Vanlig service visas alltid; resten ligger under "Större service". */
+export const isFrequent = (x: { key?: string; intervalH?: number; once?: boolean; months?: number }) =>
+  x.intervalH != null && x.intervalH <= 15 && !x.once && !['piston', 'valves'].includes(x.key ?? '') && !/^ktm-(45|90)h$/.test(x.key ?? '');

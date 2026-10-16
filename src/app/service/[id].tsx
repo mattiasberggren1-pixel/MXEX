@@ -1,9 +1,9 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, Pressable, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, Text, View } from 'react-native';
 import { Btn, C, Card, Field, Row, Screen, T, num, str } from '../../components/ui';
 import { findModel } from '../../data/bikes';
-import { oilFor, serviceTemplate } from '../../data/service';
+import { isFrequent, oilFor, partsLink, serviceTemplate } from '../../data/service';
 import { dueOf, servicesFor, uid, useStore, type Bike, type Service } from '../../store';
 
 const OIL_KEYS = ['oil', 'oilfilter', 'gearoil'];
@@ -14,7 +14,8 @@ export default function ServiceScreen() {
   const { state, update } = useStore();
   const bike = state.bikes.find((b) => b.id === id);
   const [open, setOpen] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
+  const [showBig, setShowBig] = useState(false);
+  const [showLog, setShowLog] = useState(false);
   const [edit, setEdit] = useState(false);
   const [now, setNow] = useState(0);
 
@@ -62,13 +63,15 @@ export default function ServiceScreen() {
   const withDue = items.map((x) => ({ x, d: dueOf(x, bike.hours) })).filter((e) => e.d.level !== 'done');
   const rank = (e: (typeof withDue)[number]) => Math.min(e.d.left ?? 1e9, e.d.daysLeft != null ? e.d.daysLeft / 7 : 1e9);
   withDue.sort((a, b) => rank(a) - rank(b));
-  const todo = withDue.filter((e) => e.d.level !== 'ok');
-  const later = withDue.filter((e) => e.d.level === 'ok');
-  const shownLater = showAll ? later : later.slice(0, 4);
+  const frequent = withDue.filter((e) => isFrequent(e.x));
+  const big = withDue.filter((e) => !isFrequent(e.x));
+  // Större service som passerat sitt intervall utan att markeras → tips högst upp.
+  const hints = big.filter((e) => e.d.level === 'over');
 
   const rideMin = bike.rideStart && now > bike.rideStart ? Math.floor((now - bike.rideStart) / 60000) : 0;
 
-  const row = ({ x, d }: (typeof withDue)[number]) => {
+  const row = ({ x, d }: (typeof withDue)[number], quick = false) => {
+    const parts = partsLink(x.key, model, bike.year);
     const isOpen = open === x.id;
     const color = d.level === 'over' ? C.bad : d.level === 'soon' ? C.warn : C.good;
     const status =
@@ -87,6 +90,11 @@ export default function ServiceScreen() {
             </T>
           </View>
           <T bold color={color}>{status}</T>
+          {quick ? (
+            <Pressable onPress={() => markDone(x)} hitSlop={8} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: C.good, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? C.good : 'transparent' })}>
+              <Text style={{ color: C.good, fontSize: 20, fontWeight: '900' }}>✓</Text>
+            </Pressable>
+          ) : null}
         </Row>
         {x.intervalH && !x.once ? (
           <View style={{ height: 6, backgroundColor: '#11141a', borderRadius: 3 }}>
@@ -108,6 +116,7 @@ export default function ServiceScreen() {
                 <Field label="Senast vid (h)" numeric value={str(x.lastH)} onChange={(v) => setItem(x.id, { lastH: num(v) ?? 0 })} />
               </Row>
             ) : null}
+            {parts ? <Btn small kind="ghost" title="🛒 Hitta delar på 24MX" onPress={() => Linking.openURL(parts)} /> : null}
             <Pressable onPress={() => markDone(x)} style={({ pressed }) => ({ backgroundColor: C.good, borderRadius: 12, paddingVertical: 14, alignItems: 'center', opacity: pressed ? 0.7 : 1 })}>
               <Text style={{ color: '#000', fontWeight: '800', fontSize: 17 }}>✓ Klart nu</Text>
             </Pressable>
@@ -151,22 +160,36 @@ export default function ServiceScreen() {
         </Card>
       ) : null}
 
-      {todo.length ? (
-        <Card title="Att göra">
-          {todo.map(row)}
+      {hints.length ? (
+        <Card style={{ borderColor: C.warn }}>
+          <T bold>💡 {hints.length === 1 ? 'Har du gjort det här?' : `Har du gjort de här ${hints.length}?`}</T>
+          <T dim size={13}>Intervallet har passerats men inget är markerat. Tryck Gjort om det redan är fixat.</T>
+          {hints.map(({ x }) => (
+            <Row key={x.id}>
+              <Pressable style={{ flex: 1 }} onPress={() => { setShowBig(true); setOpen(x.id); }}>
+                <T size={15}>{x.name}</T>
+                <T dim size={12}>{x.intervalH ? `var ${h1(x.intervalH)}:e h` : `var ${x.months}:e mån`} · {x.lastH > 0 ? `senast vid ${h1(x.lastH)} h` : 'inte markerad'}</T>
+              </Pressable>
+              <Btn small title="Gjort" onPress={() => markDone(x)} />
+            </Row>
+          ))}
         </Card>
-      ) : (
-        <Card><T color={C.good} bold>✓ Inget som behöver göras just nu</T></Card>
-      )}
+      ) : null}
 
-      <Card title="Kommande">
-        {shownLater.map(row)}
-        {later.length > 4 ? <Btn small kind="ghost" title={showAll ? 'Visa färre' : `Visa alla (${later.length})`} onPress={() => setShowAll(!showAll)} /> : null}
+      <Card title="Service">
+        {frequent.map((e) => row(e, true))}
+        {frequent.length === 0 ? <T dim size={14}>Inga återkommande servicepunkter.</T> : null}
       </Card>
 
-      <Card title="Servicelogg">
+      <Card title={`Större service (${big.length})`} right={<Btn small kind="ghost" title={showBig ? 'Dölj' : 'Visa'} onPress={() => setShowBig(!showBig)} />}>
+        {showBig ? big.map((e) => row(e)) : (
+          <T dim size={14}>{big[0] ? `Närmast: ${big[0].x.name}` : 'Inget planerat.'}</T>
+        )}
+      </Card>
+
+      <Card title="Servicelogg" right={log.length > 3 ? <Btn small kind="ghost" title={showLog ? 'Färre' : 'Alla'} onPress={() => setShowLog(!showLog)} /> : undefined}>
         {log.length === 0 ? <T dim size={14}>Det du markerar som klart hamnar här.</T> : null}
-        {log.slice(0, 15).map((l) => (
+        {(showLog ? log : log.slice(0, 3)).map((l) => (
           <Row key={l.id}>
             <T dim size={13} style={{ width: 82 }}>{new Date(l.date).toLocaleDateString('sv-SE')}</T>
             <T size={14} style={{ flex: 1 }}>{l.name}</T>

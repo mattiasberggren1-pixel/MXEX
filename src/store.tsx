@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { findModel, type ForkId, type ShockId } from './data/bikes';
-import { serviceTemplate, type Src } from './data/service';
+import { isFrequent, serviceTemplate, type Src } from './data/service';
 import type { Rider, Terrain } from './logic/suspension';
 
 export type Clickers = {
@@ -158,7 +158,8 @@ export function servicesFor(bike: Pick<Bike, 'id' | 'modelId' | 'year' | 'hours'
     months: it.months,
     once: it.once,
     src: it.src,
-    lastH: bike.hours,
+    // Vanlig service antas nyss gjord. Större service vet vi inte – då frågar appen när intervallet passerats.
+    lastH: isFrequent(it) ? bike.hours : 0,
     lastDate: Date.now(),
   }));
 }
