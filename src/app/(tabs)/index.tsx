@@ -14,12 +14,9 @@ export default function Garage() {
   return (
     <Screen>
       <Card title="Förare">
-        <Row>
-          <Field label="Namn (visas när du delar mappar)" value={r.name} onChange={(v) => setRider({ name: v })} placeholder="Ditt namn" />
-          <View style={{ width: 110 }}>
-            <Field label="Vikt utan utrustning (kg)" numeric value={str(r.weightKg)} onChange={(v) => setRider({ weightKg: num(v) ?? 0 })} />
-          </View>
-        </Row>
+        <View style={{ width: 200 }}>
+          <Field label="Vikt utan utrustning (kg)" numeric value={str(r.weightKg)} onChange={(v) => setRider({ weightKg: num(v) ?? 0 })} />
+        </View>
         <T dim size={13}>Nivå</T>
         <Chips options={SKILLS} value={r.skill} onChange={(v) => setRider({ skill: v })} />
         <T dim size={13}>Gren</T>
