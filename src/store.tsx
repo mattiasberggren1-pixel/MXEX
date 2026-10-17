@@ -81,6 +81,10 @@ export type State = {
   logs: SessionLog[];
   services: Service[];
   serviceLog: ServiceLog[];
+  /** Senaste lokala ändring (ms) – används vid synk. */
+  updatedAt: number;
+  /** Id:n på borttagna poster så att de inte kommer tillbaka vid synk. */
+  deleted: string[];
 };
 
 const KEY = 'mxex:v1';
@@ -92,12 +96,44 @@ const initial: State = {
   logs: [],
   services: [],
   serviceLog: [],
+  updatedAt: 0,
+  deleted: [],
 };
+
+const COLLECTIONS = ['bikes', 'maps', 'logs', 'services', 'serviceLog'] as const;
+
+/** Id:n som fanns före men inte efter en ändring. */
+function removedIds(before: State, after: State): string[] {
+  const out: string[] = [];
+  for (const c of COLLECTIONS) {
+    const now = new Set((after[c] as { id: string }[]).map((x) => x.id));
+    for (const x of before[c] as { id: string }[]) if (!now.has(x.id)) out.push(x.id);
+  }
+  return out;
+}
+
+/** Slår ihop två versioner: nyaste vinner per post, borttagna poster hålls borta. */
+export function mergeStates(a: State, b: State): State {
+  const [newer, older] = a.updatedAt >= b.updatedAt ? [a, b] : [b, a];
+  const deleted = Array.from(new Set([...(a.deleted ?? []), ...(b.deleted ?? [])])).slice(-2000);
+  const gone = new Set(deleted);
+  const out: State = { ...initial, ...older, ...newer, deleted, updatedAt: Math.max(a.updatedAt, b.updatedAt) };
+  for (const c of COLLECTIONS) {
+    const byId = new Map<string, { id: string }>();
+    for (const x of (older[c] ?? []) as { id: string }[]) byId.set(x.id, x);
+    for (const x of (newer[c] ?? []) as { id: string }[]) byId.set(x.id, x);
+    (out as Record<string, unknown>)[c] = [...byId.values()].filter((x) => !gone.has(x.id));
+  }
+  return out;
+}
 
 type Ctx = {
   state: State;
   ready: boolean;
+  /** Användarens ändringar – stämplas med tid för synk. */
   update: (fn: (s: State) => State) => void;
+  /** Ersätter state utan att räknas som lokal ändring (används av synken). */
+  replace: (s: State) => void;
 };
 
 const StoreCtx = createContext<Ctx | null>(null);
@@ -114,7 +150,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const saved = JSON.parse(raw);
           // Nivån "van" heter numera "avancerad".
           if (saved.rider?.skill === 'van') saved.rider.skill = 'avancerad';
-          setState({ ...initial, ...saved });
+          setState({ ...initial, ...saved, deleted: saved.deleted ?? [], updatedAt: saved.updatedAt ?? 0 });
         }
       })
       .finally(() => {
@@ -127,7 +163,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (loaded.current) AsyncStorage.setItem(KEY, JSON.stringify(state));
   }, [state]);
 
-  const value = useMemo<Ctx>(() => ({ state, ready, update: (fn) => setState((s) => fn(s)) }), [state, ready]);
+  const value = useMemo<Ctx>(
+    () => ({
+      state,
+      ready,
+      update: (fn) =>
+        setState((s) => {
+          const next = fn(s);
+          if (next === s) return s;
+          const gone = removedIds(s, next);
+          return { ...next, updatedAt: Date.now(), deleted: gone.length ? [...s.deleted, ...gone] : next.deleted };
+        }),
+      replace: (s) => setState(s),
+    }),
+    [state, ready],
+  );
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }
 
@@ -175,3 +225,6 @@ export function dueOf(x: Service, hours: number, now = Date.now()): Due {
   const soon = (left != null && x.intervalH != null && left <= Math.max(1, x.intervalH * 0.2)) || (daysLeft != null && daysLeft <= 30);
   return { left, daysLeft, level: over ? 'over' : soon ? 'soon' : 'ok' };
 }
+
+/** Tomt utgångsläge (t.ex. efter utloggning). */
+export const emptyState: State = initial;

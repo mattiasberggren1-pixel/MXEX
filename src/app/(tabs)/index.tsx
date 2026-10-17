@@ -4,6 +4,7 @@ import { FORKS, findModel } from '../../data/bikes';
 import { Btn, C, Card, Chips, Field, Row, Screen, T, num, str } from '../../components/ui';
 import { DISCIPLINES, SKILLS } from '../../logic/suspension';
 import { dueOf, useActiveBike, useStore } from '../../store';
+import { useSync } from '../../sync';
 
 export default function Garage() {
   const { state, update } = useStore();
@@ -13,6 +14,7 @@ export default function Garage() {
 
   return (
     <Screen>
+      <AccountBar />
       <Card title="Förare">
         <View style={{ width: 200 }}>
           <Field label="Vikt utan utrustning (kg)" numeric value={str(r.weightKg)} onChange={(v) => setRider({ weightKg: num(v) ?? 0 })} />
@@ -69,6 +71,29 @@ function ServiceBtn({ bikeId, hours }: { bikeId: string; hours: number }) {
     <Pressable onPress={() => router.push(`/service/${bikeId}`)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: over ? C.bad : C.line, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12 }}>
       <T bold>🔧 Service</T>
       {badge ? <View style={{ backgroundColor: over ? C.bad : C.warn, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}><T bold size={12} color="#000">{badge}</T></View> : <T dim size={13}>allt ok</T>}
+    </Pressable>
+  );
+}
+
+function AccountBar() {
+  const { session, status } = useSync();
+  return (
+    <Pressable onPress={() => router.push('/account')} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: session ? C.line : C.accent, borderRadius: 12, padding: 12 }}>
+      <T size={20}>{session ? '☁️' : '👤'}</T>
+      <View style={{ flex: 1 }}>
+        {session ? (
+          <>
+            <T bold size={14}>{session.user.email}</T>
+            <T dim size={12}>{status === 'synkad' ? 'Sparat i molnet' : status === 'synkar' ? 'Synkar…' : status === 'fel' ? 'Ej synkat just nu' : ''}</T>
+          </>
+        ) : (
+          <>
+            <T bold size={14}>Logga in / skapa konto</T>
+            <T dim size={12}>Spara allt i molnet och använd flera enheter</T>
+          </>
+        )}
+      </View>
+      <T color={C.accent}>›</T>
     </Pressable>
   );
 }
