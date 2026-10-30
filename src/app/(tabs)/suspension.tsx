@@ -98,6 +98,7 @@ export default function Suspension() {
         <Line label="Gaffelrör i kronan" v={cl.forkHeight === 0 ? 'Standard' : cl.forkHeight > 0 ? `${cl.forkHeight} mm upp (snabbare styrning)` : `${-cl.forkHeight} mm ner (stabilare)`} />
         <Line label="Däcktryck fram/bak" v={`${str(cl.tyres[0])} / ${str(cl.tyres[1])} bar`} />
         {cl.notes.map((n, i) => <T key={i} dim size={13}>• {n}</T>)}
+        <Btn small kind="ghost" title="Hur hittar jag standardläget?" onPress={() => router.push('/standard')} />
         {!st.forkComp && !st.shockLsc ? <T dim size={12}>Tips: fyll i standardklicken under cykeln i Garaget så visas exakta värden.</T> : null}
         <Row>
           <Btn small title="Spara i loggen" onPress={saveToLog} />

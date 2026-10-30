@@ -125,6 +125,7 @@ export default function EditBike() {
       {model ? (
         <Card title="Standardklick (från instruktionsboken)">
           <T dim size={13}>Valfritt. Anges som klick UT från helt stängt (medurs i botten). Med detta visar appen exakta klick i stället för 2 klick hårdare.</T>
+          <Btn small kind="ghost" title="Hur räknar man klick?" onPress={() => router.push('/standard')} />
           <Row>
             <Field label="Gaffel komp." numeric value={str(stock.forkComp)} onChange={(v) => setStock('forkComp', v)} />
             <Field label="Gaffel retur" numeric value={str(stock.forkReb)} onChange={(v) => setStock('forkReb', v)} />

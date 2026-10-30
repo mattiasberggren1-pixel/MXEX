@@ -20,6 +20,7 @@ export default function RootLayout() {
           <Stack.Screen name="import" options={{ title: 'Importera mapp' }} />
           <Stack.Screen name="map/index" options={{ title: 'Importera mapp' }} />
           <Stack.Screen name="service/[id]" options={{ title: 'Service' }} />
+          <Stack.Screen name="standard" options={{ title: 'Standardläge' }} />
           <Stack.Screen name="account" options={{ title: 'Konto' }} />
           <Stack.Screen name="troubleshoot" options={{ title: 'Felsök fjädringen' }} />
         </Stack>

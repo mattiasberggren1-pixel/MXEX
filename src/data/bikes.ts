@@ -7,9 +7,9 @@ export type BikeClass =
 
 export type ForkId =
   | 'kyb-coil' | 'showa-coil' | 'wp-coil' | 'wp-xplor'
-  | 'wp-aer' | 'showa-tac-air' | 'kyb-psf-air' | 'other-coil' | 'other-air';
+  | 'wp-aer' | 'showa-tac-air' | 'kyb-psf-air' | 'ohlins-coil' | 'ohlins-air' | 'other-coil' | 'other-air';
 
-export type ShockId = 'kyb' | 'showa' | 'wp-link' | 'wp-pds' | 'zf' | 'other';
+export type ShockId = 'kyb' | 'showa' | 'wp-link' | 'wp-pds' | 'ohlins' | 'zf' | 'other';
 
 export const FORKS: Record<ForkId, { name: string; air: boolean }> = {
   'kyb-coil': { name: 'KYB spiral (SSS / 48 mm)', air: false },
@@ -19,6 +19,8 @@ export const FORKS: Record<ForkId, { name: string; air: boolean }> = {
   'wp-aer': { name: 'WP XACT AER 48 (luft)', air: true },
   'showa-tac-air': { name: 'Showa SFF-Air TAC (luft)', air: true },
   'kyb-psf-air': { name: 'KYB PSF / PSF2 (luft)', air: true },
+  'ohlins-coil': { name: 'Öhlins spiral (t.ex. RXF 48)', air: false },
+  'ohlins-air': { name: 'Öhlins luft', air: true },
   'other-coil': { name: 'Annan spiralgaffel', air: false },
   'other-air': { name: 'Annan luftgaffel', air: true },
 };
@@ -28,6 +30,7 @@ export const SHOCKS: Record<ShockId, string> = {
   showa: 'Showa (länk)',
   'wp-link': 'WP XACT (länk)',
   'wp-pds': 'WP XPLOR PDS (utan länk)',
+  ohlins: 'Öhlins (TTX m.fl.)',
   zf: 'ZF / Sachs',
   other: 'Annan',
 };
@@ -120,7 +123,8 @@ export const MODELS: Model[] = [
     g(2022, NOW, 'showa-coil', 'showa', 'honda-modes-tc'),
   ]),
   m('Honda', 'CRF450R', '450-4T', 'mx', [
-    g(2010, 2014, 'showa-coil', 'showa', 'honda-hrc'),
+    g(2010, 2012, 'kyb-coil', 'showa', 'honda-hrc'),
+    g(2013, 2014, 'showa-coil', 'showa', 'honda-hrc'),
     g(2015, 2016, 'showa-tac-air', 'showa', 'honda-hrc'),
     g(2017, 2020, 'showa-coil', 'showa', 'honda-modes'),
     g(2021, NOW, 'showa-coil', 'showa', 'honda-modes-tc'),
